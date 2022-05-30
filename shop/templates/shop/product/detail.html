@@ -6,8 +6,8 @@
 {% block content %}
     <div class="product-detail">
         <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/no_image.png' %}{% endif %}">
-        <h1 id="sensitive">
-            Only {{product.stock}} &quot;{{ product.name }}&quot; available on stock.
+        <h1>
+            Only <strong id="sensitive"><em>{{product.stock}}</em></strong> &quot;{{ product.name }}&quot; available on stock.
         </h1>
         <h2>
             <a href="{{ product.category.get_absolute_url }}">{{ product.category }}</a>
@@ -15,7 +15,8 @@
         <p class="price">${{ product.price }}</p>
         {{ product.description|linebreaks }}
 
-        <form action="{% url  'cartAdd' product.id %}" method="post">
+        <!--The form is handled to cart_add view, thus 'action'-->
+        <form action="{% url  'cart:cartAdd' product.id %}" method="post">
             {{ cart_product_form }}
             {% csrf_token %}
             <input type="submit" value="Add to cart">

@@ -3,7 +3,7 @@
 <html>
     <head>
         <meta charset="utf-8" />
-        <title>{% block title %}My shop{% endblock %}</title>
+        <title>{% block title %}My shop{% endblock title %}</title>
         <link href="{% static 'css/base.css' %}" rel="stylesheet">
     </head>
     <body>
@@ -15,7 +15,7 @@
                 {% with total_items=cart|length %}
                 {% if cart|length > 0 %}
                     Your cart:
-                <a href="{% url 'cartDetail' %}">
+                <a href="{% url 'cart:cartDetail' %}">
                     {{ total_items }} item{{ total_items|pluralize }},
                     ${{ cart.get_total_price }}
                 </a>
@@ -36,7 +36,32 @@
                 {% endif %}
             {% endblock messages %}
             {% block content %}
-            {% endblock %}
+            {% endblock content %}
         </div>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+        <script src=" http://cdn.jsdelivr.net/jquery.cookie/1.4.1/jquery.cookie.min.js "></script>
+        <script>
+            //Create cross site request forgery token for each ajax request.
+            /*
+            * Extract django 'csrf_token' from cookies.
+            * Create reliable requests, i.e should not be checked.
+            * Send django 'csrf_token' to ajax request through 'X-CSRFToken'
+            */
+            var csrftoken = $.cookies('csrftoken');
+            function reliableMethod(method){
+                return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+            }
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings){
+                    if(!reliableMethod(settings.type) && !this.crossDomain){
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
+                }
+            });
+            $(document).ready(function(){
+                {% block doomready %}
+                {% endblock doomready %}
+            });
+        </script>
     </body>
 </html>
