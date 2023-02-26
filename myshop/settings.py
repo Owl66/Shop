@@ -9,9 +9,24 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
+"""
+TODO:-
++login and logout.
++registration.
++reset password.
++user profile.
++delete account.
+-like, dislike, sharing and commenting system -> I'll use the third part lib.
+
+===ADDITIONS IF POSSIBLE(not necessarily to be implemented)===
+-Give users control to their account to post things and delete them.
+-follower system, people must see only posts of their followers and get notification if the new posts are
+available.
+"""
 
 from pathlib import Path
 import os
+from django.urls import reverse_lazy
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +41,7 @@ SECRET_KEY = 'django-insecure-ciz6@cifc)q370yo(ile$zh!r@94%zvhti^)u&fb9(@(_h^tpl
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', '127.0.0.1:4040', 'c329-154-74-142-36.ngrok.io']
 
 
 # Application definition
@@ -44,6 +59,12 @@ INSTALLED_APPS = [
     'cart',
     'orders',
     'coupons',
+    'sorl.thumbnail',
+    'account',
+    'crispy_forms',
+    'django_bootstrap5',
+    'django.contrib.humanize',
+    'vote',
 ]
 
 MIDDLEWARE = [
@@ -122,14 +143,14 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
-STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+STATIC_URL = '/static/'
+#STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR,  'media/')
 
 
-
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static/'),]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -142,3 +163,8 @@ CART_SESSION_ID = 'cart'
 REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
 REDIS_DB = 1
+
+THUMBNAIL_DEBUG = True
+
+LOGIN_REDIRECT_URL = reverse_lazy('shop:productList')
+CRISPY_TEMPLATE_PACK = 'bootstrap'

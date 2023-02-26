@@ -1,0 +1,10 @@
+{% extends "shop/base.html" %}
+{% block title %}Delete account {% endblock %}
+{% block content %}
+    <h1> Delete account </h1>
+    <p> Are you sure you want to delete your account? The process can't be undone</p>
+    <form action="{% url "account:deleteAccount" %}" method="POST">
+        {% csrf_token %}
+        <input type="submit" class="btn btn-danger" value="Delete Account">
+    </form>
+{% endblock %}

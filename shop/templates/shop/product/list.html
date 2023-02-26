@@ -1,7 +1,7 @@
-{% extends "shop/base.html" %}
+{% extends "../base.html" %}
 {% load static %}
 {% block title %}
-    {% if category %}{{ category.name }}{% else %}Products{% endif %}
+    {% if category %}{{ category.name }}{% else %}Product{% endif %}
 {% endblock %}
 {% block content %}
     <div id="sidebar">
@@ -17,25 +17,41 @@
             {% endfor %}
         </ul>
     </div>
+    <h1>{% if category %}{{ category.name }}{% else %}Products{% endif %}</h1>
     <div id="main" class="product-list">
-        <h1>{% if category %}{{ category.name }}{% else %}Products{% endif %}</h1>
-        {% for product in products %}
+        {% include "shop/product/list_ajax.html" %}
+        <!--{% for product in products %}
             <div class="item">
                 <a href="{{ product.get_absolute_url }}">
-                    <img src="{% if product.image %}{{ product.image.url }}{%else%}{% static 'img/no_image.png' %}{% endif %}">
+                    <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/no_image.png' %}{% endif %}">
                 </a>
                 <a href="{{ product.get_absolute_url }}">{{ product.name }}</a><br>
-                ${{ product.price }}
+                ${{ product.price }}    
             </div>
-        {% endfor %}
+        {% endfor %}-->
     </div>
-    {% include "../page.html" with page=products %}
+    <!--{% include "../page.html" with page=products %}-->
+    
 {% endblock %}
 
-
-<!--TODO:-
-    Additional javascript codes for handling loading additional pages.
--->
-{% block doomready %}
-<!--Implementation goes here. -->
-{% endblock doomready %}
+{% block domready %}  
+    var page = 1;
+    var empty_page = false;
+    var block_request = false;
+    $(window).scroll(function() {
+        var margin = $(document).height() - $(window).height() - 200;
+        if ($(window).scrollTop() > margin && empty_page == false && block_request == false) {
+            block_request = true;
+            page += 1;
+            $.get("?page=" + page, function(data) {
+                if(data == '') {
+                    empty_page = true;
+                }
+                else {
+                    block_request = false;
+                    $('#main').append(data);
+                }
+            });
+        }
+    })
+{% endblock domready %}

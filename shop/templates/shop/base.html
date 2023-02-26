@@ -1,34 +1,95 @@
 <!DOCTYPE html>
+{% load django_bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
 {% load static %}
 <html>
     <head>
-        <meta charset="utf-8" />
+        <meta charset="utf-16" />
         <title>{% block title %}My shop{% endblock title %}</title>
         <link href="{% static 'css/base.css' %}" rel="stylesheet">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src=" http://cdn.jsdelivr.net/jquery.cookie/1.4.1/jquery.cookie.min.js "></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD" crossorigin="anonymous"></script>
     </head>
     <body>
-        <div id="header">
-            <a href="/" class="logo">My shop</a>
-        </div>
-        <div id="subheader">
-            <div class="cart">
-                {% with total_items=cart|length %}
-                {% if cart|length > 0 %}
-                    Your cart:
-                <a href="{% url 'cart:cartDetail' %}">
-                    {{ total_items }} item{{ total_items|pluralize }},
-                    ${{ cart.get_total_price }}
-                </a>
+        <!--<a href="/" class="logo">My shop</a>-->
+
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+              <a class="navbar-brand" href="/">My Shop</a>
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url "account:logout" %}">Log out</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          Settings
+                        </a>
+                        <ul class="dropdown-menu">
+                          <li><a class="dropdown-item" href="{% url 'account:passwordChange'%}">Password Change</a></li>
+                          <li><a class="dropdown-item" href="{% url 'account:editProfile'%}">Edit Profile</a></li>
+                          <!--<li><hr class="dropdown-divider"></li>
+                          <li><a class="dropdown-item" href="#">Something else here</a></li>-->
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'account:profile'%}">Hello, {{user}}</a>
+                    </li>
                 {% else %}
-                    Your cart is empty.
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url "account:login" %}">Log in</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url "account:register" %}">Sign up</a>
+                    </li>
                 {% endif %}
-                {% endwith %}
+                </ul>
+                <form class="d-flex" role="search">
+                  <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                  <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+              </div>
             </div>
+        </nav>
+
+
+
+
+
+
+
+        <div id="header">
+            
         </div>
+        {% if user.is_authenticated %}
+            <div id="subheader">
+                <div class="cart">
+                    {% with total_items=cart|length %}
+                    {% if cart|length > 0 %}
+                        Your cart:
+                    <a href="{% url 'cart:cartDetail' %}">
+                        {{ total_items }} item{{ total_items|pluralize }},
+                        ${{ cart.get_total_price }}
+                    </a>
+                    {% else %}
+                        Your cart is empty.
+                    {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+        {% endif %}
         <div id="content">
             {% block messages %}
                 {% if messages %}
-                    <ul class="messagelist">
+                    <ul class="messages">
                         {% for message in messages %}
                            <li> {{message|capfirst|safe}}</li>
                         {% endfor %}
@@ -38,16 +99,8 @@
             {% block content %}
             {% endblock content %}
         </div>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-        <script src=" http://cdn.jsdelivr.net/jquery.cookie/1.4.1/jquery.cookie.min.js "></script>
         <script>
-            //Create cross site request forgery token for each ajax request.
-            /*
-            * Extract django 'csrf_token' from cookies.
-            * Create reliable requests, i.e should not be checked.
-            * Send django 'csrf_token' to ajax request through 'X-CSRFToken'
-            */
-            var csrftoken = $.cookies('csrftoken');
+            var csrftoken = $.cookie('csrftoken');
             function reliableMethod(method){
                 return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
             }
@@ -59,8 +112,8 @@
                 }
             });
             $(document).ready(function(){
-                {% block doomready %}
-                {% endblock doomready %}
+                {% block domready %}    
+                {% endblock %} 
             });
         </script>
     </body>

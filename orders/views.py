@@ -1,4 +1,3 @@
-#import weasyprint
 from django.shortcuts import render
 from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import get_object_or_404
@@ -9,8 +8,10 @@ from cart.cart import Cart
 from django.conf import settings
 from django.http import HttpResponse 
 from django.template.loader import render_to_string
-from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+import weasyprint
 
+@login_required
 def order_create(request):
     cart = Cart(request)
     if request.method == 'POST':
@@ -21,12 +22,13 @@ def order_create(request):
                 order.coupon = cart.coupon
                 order.discount = cart.coupon.discount
             order.save()
+            cd = form.cleaned_data
+            email = cd['email']
             for item in cart:
                 OrderItem.objects.create(order=order, product=item['product'], price=item['price'], 
                                         quantity=item['quantity'])
             cart.clear()
-            messages.success(request, "Your order has been successfully completed.")
-            return render(request, 'orders/order/created.html', {'order':order})
+            return render(request, 'orders/order/created.html', {'order':order, 'email':email})
     else:
         form = OrderCreateForm()
     return render(request, 'orders/order/create.html', {'cart':cart, 'form':form})

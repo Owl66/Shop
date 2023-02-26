@@ -3,3 +3,5 @@ __pycache__/
 *.sqlite3
 v_env/
 migrations/
+Redis/
+media/

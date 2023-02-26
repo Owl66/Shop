@@ -28,27 +28,22 @@ def export_to_csv(modeladmin, request, queryset):
     return response
 export_to_csv.short_description = 'Export to csv'
 
-'''
-The below method, order_detail has the following problem that needs fixing.
-    "<class 'orders.admin.OrderAdmin'>: (admin.E108) The value of 'list_display[9]'
-    refers to 'order_detail', which is not a callable, an attribute of 'OrderAdmin', 
-    or an attribute or method on 'orders.Order'."
-'''
 
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
     raw_id_fields = ['product',]
 
 class OrderAdmin(admin.ModelAdmin):
+    list_per_page = 10
     @mark_safe
     def order_pdf(self, obj):
-        return '<a href="{}">PDF</a>'.format(reverse('adminOrderPdf', args=[obj.id]))
+        return '<a href="{}">PDF</a>'.format(reverse('order:adminOrderPdf', args=[obj.id]))
     order_pdf.allow_tags = True
     order_pdf.short_description = 'PDF bill'
     
     @mark_safe
     def order_detail(self, obj):
-        return '<a href="{}">View</a>'.format(reverse('adminOrderDetail', args=[obj.id]))
+        return '<a href="{}">View</a>'.format(reverse('order:adminOrderDetail', args=[obj.id]))
     order_detail.allow_tags = True 
     
     list_display = ['id', 'first_name', 'last_name', 'email', 'address', 'postal_code',
