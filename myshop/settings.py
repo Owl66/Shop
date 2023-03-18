@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'django_bootstrap5',
     'django.contrib.humanize',
     'vote',
+    'actions',
 ]
 
 MIDDLEWARE = [
@@ -168,3 +169,7 @@ THUMBNAIL_DEBUG = True
 
 LOGIN_REDIRECT_URL = reverse_lazy('shop:productList')
 CRISPY_TEMPLATE_PACK = 'bootstrap'
+
+ABSOLUTE_URL_OVERRIDES = {
+    'auth.user': lambda u : reverse_lazy('account:userDetail', args=[u.username])
+}

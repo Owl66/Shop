@@ -19,6 +19,11 @@ urlpatterns = [
     #delete account
     re_path(r'^delete-account/$', views.deleteAccount, name='deleteAccount'),
     re_path(r'^profile/$', views.profile, name='profile'),
+    #There is a bug here! The form is not seen to be populated by profile data.
     re_path(r'^edit-profile/$', views.editProfile, name='editProfile'),
+    #Display user list
+    re_path(r'^users/$', views.userList, name='userList'),
+    re_path(r'^user/(?P<username>[-\w]+)/$', views.userDetail, name='userDetail'),
+    re_path(r'^users/follow/$', views.userFollow, name='userFollow'),
     
 ]

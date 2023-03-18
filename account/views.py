@@ -1,10 +1,16 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login
 from .forms import LoginForm, UserCreationForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .forms import UserEditForm, ProfileEditForm
+from django.contrib.auth.models import User
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+#from common.decorators import ajax_required
+from .models import Contact
+from actions.utils import create_action
 
 def userLogin(request):
     if request.method == 'POST':
@@ -36,6 +42,7 @@ def register(request):
             new_user.set_password(user_form.cleaned_data['password'])
             # Save the User object
             new_user.save()
+            create_action(new_user, 'has created an account')
             messages.success(request, f'Congratulation! Thank you for joining with us.')
             return redirect('account:login')
     else:
@@ -58,6 +65,7 @@ def editProfile(request):
         if userEditForm.is_valid() and profileEditForm.is_valid():
             profileEditForm.save()
             userEditForm.save()
+            create_action(request.user, 'has edited their profile.')
     else:
         userEditForm = UserEditForm(instance=request.user)
         profileEditForm = ProfileEditForm(instance=request.user.profile)
@@ -66,3 +74,30 @@ def editProfile(request):
 @login_required
 def profile(request):
     return render(request, 'registration/profile.html', )
+
+def userList(request):
+    users = User.objects.filter(is_active=True)
+    return render(request, 'user/list.html', {'section':'people', 'users':users})
+
+def userDetail(request, username):
+    user = get_object_or_404(User, username=username, is_active=True)
+    return render(request, 'user/detail.html', {'section':'people', 'user':user})
+
+#@ajax_required
+@require_POST
+@login_required
+def userFollow(request):
+    user_id = request.POST.get('id')
+    action = request.POST.get('action')
+    if user_id and action:
+        try:
+            user = User.objects.get(id=user_id)
+            if action == 'follow':
+                Contact.objects.get_or_create(userFrom=request.user, userTo=user)
+                create_action(request.user, 'is following', user)
+            else:
+                Contact.objects.filter(userFrom=request.user, userTo=user).delete()
+            return JsonResponse({'status':'ok'})
+        except User.DoesNotExist:
+            return JsonResponse({'status':'ko'})
+    return JsonResponse({'status':'ko'})

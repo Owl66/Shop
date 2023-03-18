@@ -1,4 +1,5 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
 from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
@@ -7,11 +8,14 @@ from .models import Category, Product
 from cart.forms import CartAddProductForm
 from .recommender import Recommender, r
 from .forms import PostForm
+from actions.utils import create_action
+from actions.models import Action
 
 @login_required
 def product_detail(request, id, slug):
     re = Recommender()
     product = get_object_or_404(Product, id=id,slug=slug, available=True)
+    print(product.id)
     product_views = re.get_number_of_views(product)
     cart_product_form = CartAddProductForm()
     recommended_products = re.suggest_products_for([product], 6)
@@ -25,17 +29,18 @@ def product_detail(request, id, slug):
 
 
 @login_required
-def createPost(request):
+def createProduct(request):
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES)
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
             post.save()
-            return redirect("/")
+            create_action(request.user, 'has new product available for you!')
+            return redirect(reverse('shop:productDetail', args=[post.id, post.slug]))
     else:
         form = PostForm()
-    return render(request, 'shop/product/createPost.html', {'form': form})
+    return render(request, 'shop/product/createProduct.html', {'form': form})
             
 
 #Function to check for ajax request.
@@ -70,6 +75,28 @@ def product_list(request, category_slug=None):
     context = {
         'categories': categories,
         'category' : category,
-        'products' : products,     
+        'products' : products,    
     }
     return render(request, 'shop/product/list.html', context)
+
+
+@login_required
+def deleteProduct(request, id):
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            post = get_object_or_404(Product, id=id)
+            post.delete()
+            create_action(request.user, 'has remove their product.')
+            return redirect("/")
+    return render(request, 'shop/product/deleteProduct.html')
+
+
+@login_required
+def currently(request):
+    actions = Action.objects.exclude(user=request.user)
+    following_ids = request.user.following.values_list('id', flat=True)
+    if following_ids:
+        # If user is following others, retrieve only their actions
+        actions = actions.filter(user_id__in=following_ids).select_related('user', 'user__profile').prefetch_related('target')
+        actions = actions[:10]
+    return render(request, 'shop/product/currently.html', {'actions' : actions})

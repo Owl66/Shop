@@ -6,8 +6,9 @@
                     <a href="{{ product.get_absolute_url }}">
                         <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/no_image.png' %}{% endif %}">
                     <div>
-                        <a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
-                        </br>${{product.price}}
+                        <a href="{{ product.get_absolute_url }}">{{ product.name }}</a> 
+                        by {{product.author}}
+                        </br>${{product.price}} 
                     </div>
                 </div>
             </div>

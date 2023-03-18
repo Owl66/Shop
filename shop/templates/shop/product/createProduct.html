@@ -2,7 +2,7 @@
 {% block content %}
 <div class="center">
     <h2> Advertise new product </h2>
-    <form method="post" action="{% url 'shop:createPost' %}" enctype="multipart/form-data">
+    <form method="post" action="{% url 'shop:createProduct' %}" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
         <p><input type="submit" value="Advertise"></p>

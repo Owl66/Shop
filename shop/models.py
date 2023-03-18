@@ -3,6 +3,7 @@ from django.urls import reverse
 from PIL import Image
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
+from django.utils.text import slugify
 
 class Category(models.Model):
     name = models.CharField(max_length=200, db_index=True)
@@ -22,8 +23,7 @@ class Category(models.Model):
 
 class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
-    #This field should be added and work as expected.
-    #author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='post', default=1)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='post', default=1)
     name = models.CharField(max_length=200, db_index=True)
     slug = models.SlugField(max_length=200, db_index=True)
     image = models.ImageField(upload_to='products/%Y/%m/%d', blank=True)
@@ -45,6 +45,8 @@ class Product(models.Model):
         return reverse('shop:productDetail', args=[self.id, self.slug,])
     
     def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
         if self.image:
             if not self.image.is_valid():
                 raise ValueError("The image file is not valid")

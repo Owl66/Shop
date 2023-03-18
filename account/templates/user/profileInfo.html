@@ -1,0 +1,21 @@
+<div class="center">
+    <div class="card" style="width: 18rem;">
+        <img src="{{user.profile.profile_picture.url}}" class="card-img-top" alt="{{user.username}}">
+        <div class="card-body">
+        <h5 class="card-title"><b>Profile</b></h5>
+        <p class="card-text"></p>
+        </div>
+        <ul class="list-group list-group-flush">
+        <li class="list-group-item"><b>username:</b> {{user.username}}</li>
+        <li class="list-group-item"><b>Location:</b> {{user.profile.location}}</li>
+        <li class="list-group-item"><b>Birth date:</b> {{user.profile.birth_date}}</li>
+        <li class="list-group-item"><b>email:</b> {{user.email}}</li>
+        <li class="list-group-item"><b>Bio:</b> {{user.profile.bio}}</li>
+        </ul>
+        <div class="card-body">
+        {% if user.is_authenticated %}
+            <a href="{% url 'account:editProfile' %}" class="card-link">Edit profile</a>
+        {% endif %}
+        </div>
+    </div>
+</div>
