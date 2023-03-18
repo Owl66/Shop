@@ -1,4 +1,5 @@
 {% extends "shop/base.html" %}
+{% load thumbnail %}
 {% block title %}People{% endblock %}
 {% block content %}
     <h1>People</h1>
@@ -6,7 +7,9 @@
         {% for user in users %}
             <div class="user">
                 <a href="{{ user.get_absolute_url }}">
-                    <img src="{{ user.profile.profile_picture.url }}">
+                    {% thumbnail user.profile.profile_picture "180x180" crop="100%" as im %}
+                    <img src="{{ im.url }}">
+                    {% endthumbnail %}
                 </a>
                 <div class="info">
                     <a href="{{ user.get_absolute_url }}" class="title">

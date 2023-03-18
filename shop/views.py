@@ -10,12 +10,12 @@ from .recommender import Recommender, r
 from .forms import PostForm
 from actions.utils import create_action
 from actions.models import Action
+from .utils import is_ajax
 
 @login_required
 def product_detail(request, id, slug):
     re = Recommender()
     product = get_object_or_404(Product, id=id,slug=slug, available=True)
-    print(product.id)
     product_views = re.get_number_of_views(product)
     cart_product_form = CartAddProductForm()
     recommended_products = re.suggest_products_for([product], 6)
@@ -26,7 +26,6 @@ def product_detail(request, id, slug):
         'product_views': product_views,
     }
     return render(request, 'shop/product/detail.html', context)
-
 
 @login_required
 def createProduct(request):
@@ -41,11 +40,6 @@ def createProduct(request):
     else:
         form = PostForm()
     return render(request, 'shop/product/createProduct.html', {'form': form})
-            
-
-#Function to check for ajax request.
-def is_ajax(request):
-    return request.headers.get('X-Requested-With')=='XMLHttpRequest'
 
 #Infinity scrolling using ajax
 def product_list(request, category_slug=None):
@@ -79,7 +73,6 @@ def product_list(request, category_slug=None):
     }
     return render(request, 'shop/product/list.html', context)
 
-
 @login_required
 def deleteProduct(request, id):
     if request.method == 'POST':
@@ -89,7 +82,6 @@ def deleteProduct(request, id):
             create_action(request.user, 'has remove their product.')
             return redirect("/")
     return render(request, 'shop/product/deleteProduct.html')
-
 
 @login_required
 def currently(request):

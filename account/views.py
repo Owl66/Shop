@@ -8,7 +8,7 @@ from .forms import UserEditForm, ProfileEditForm
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-#from common.decorators import ajax_required
+from shop.utils import ajax_required
 from .models import Contact
 from actions.utils import create_action
 
@@ -83,7 +83,7 @@ def userDetail(request, username):
     user = get_object_or_404(User, username=username, is_active=True)
     return render(request, 'user/detail.html', {'section':'people', 'user':user})
 
-#@ajax_required
+@ajax_required
 @require_POST
 @login_required
 def userFollow(request):
