@@ -1,4 +1,5 @@
 {% load static %}
+{% load thumbnail %}
 <div class="infinite-container">
     {% for product in products %}
             <div class="item">
@@ -7,11 +8,25 @@
                         <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/no_image.png' %}{% endif %}">
                     <div>
                         <a href="{{ product.get_absolute_url }}">{{ product.name }}</a> 
-                        by {{product.author}}
+                        <span class="date"> by {{product.author}} </span>
                         </br>${{product.price}} 
-                    </div>
+                    </div>                       
+                    {% with total_likes=product.users_like.count users_like=product.users_like.all %}
+                        <div>
+                            <span class="total">{{ total_likes }}</span> like{{ total_likes|pluralize }}
+                            <a href="#" data-id="{{ product.id }}" data-action="{% if request.user in users_like %}un{% endif %}like" class="like button">
+                                {% if request.user not in users_like %}
+                                Like
+                                {% else %}
+                                Unlike
+                                {% endif %}
+                            </a>
+                        </div>
+                    {% endwith %}    
                 </div>
             </div>
     {% endfor %}
 </div>
+
+
 

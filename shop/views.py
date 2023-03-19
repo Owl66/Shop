@@ -4,6 +4,8 @@ from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
 from .models import Category, Product
 from cart.forms import CartAddProductForm
 from .recommender import Recommender, r
@@ -25,7 +27,7 @@ def product_detail(request, id, slug):
         'recommended_products': recommended_products,
         'product_views': product_views,
     }
-    return render(request, 'shop/product/detail.html', context)
+    return render(request, 'shop/product/detail.html', context,)
 
 @login_required
 def createProduct(request):
@@ -41,7 +43,7 @@ def createProduct(request):
         form = PostForm()
     return render(request, 'shop/product/createProduct.html', {'form': form})
 
-#Infinity scrolling using ajax
+#Infinite scrolling using ajax
 def product_list(request, category_slug=None):
     category = None
     categories = Category.objects.all()
@@ -92,3 +94,22 @@ def currently(request):
         actions = actions.filter(user_id__in=following_ids).select_related('user', 'user__profile').prefetch_related('target')
         actions = actions[:10]
     return render(request, 'shop/product/currently.html', {'actions' : actions})
+
+@login_required
+@require_POST
+def productLike(request):
+    product_id = request.POST.get('id')
+    action = request.POST.get('action')
+    if product_id and action:
+        try:
+            product = Product.objects.get(id=product_id)
+            if action == 'like':
+                product.users_like.add(request.user)
+                create_action(request.user, 'likes', product)
+            else:
+                product.users_like.remove(request.user)
+                create_action(request.user, 'unlikes', product)
+            return JsonResponse({'status':'ok'})
+        except:
+            pass
+    return JsonResponse({'status':'ko'})

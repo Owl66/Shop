@@ -33,13 +33,14 @@ class Product(models.Model):
     available = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    users_like = models.ManyToManyField(User, related_name='images_liked', blank=True)
 
     class Meta:
         ordering = ('-created',)
         index_together = (('id', 'slug'),)
 
     def __str__(self):
-        return self.name
+        return f'{self.name} by {self.author}'
     
     def get_absolute_url(self):
         return reverse('shop:productDetail', args=[self.id, self.slug,])
@@ -58,4 +59,3 @@ class Product(models.Model):
                 img.save(self.image.path)
         else:
             super().save()
-
